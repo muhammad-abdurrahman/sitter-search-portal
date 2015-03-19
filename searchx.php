@@ -17,14 +17,10 @@ $sortOptions = $_POST['sortOptions'];
 //    $fromRecordNo = (($page - 1) * 9) + 1;
 //    $toRecordNo = $fromRecordNo + 9;
 //}
-
-
 //    if (empty($_POST['postcode'])) {
 //        header('Location: searchx.php?error=true');
 //        exit;
 //    } else {
-
-
 //       //With Pagination
 //        $webServiceUrl;
 //        if ($isExcludeImageCheck) {
@@ -33,12 +29,12 @@ $sortOptions = $_POST['sortOptions'];
 //            $webServiceUrl = 'http://stu-nginx.cms.gre.ac.uk/~am238/WebServices/getAllPostsGivenSitterTypeAndPostcodeWithPagination.php?sitterType=' . $sitterType . '&postcode=' . $postcode . '&fromRecordNo=1&toRecordNo=9';
 //        }
 
-        $webServiceUrl;
-        if ($isExcludeImageCheck) {
-            $webServiceUrl = 'http://stu-nginx.cms.gre.ac.uk/~am238/WebServices/getAllPostsGivenSitterTypeAndPostcodeWithImages.php?sitterType=' . $sitterType . '&postcode=' . $postcode;
-        } else {
-            $webServiceUrl = 'http://stu-nginx.cms.gre.ac.uk/~am238/WebServices/getAllPostsGivenSitterTypeAndPostcode.php?sitterType=' . $sitterType . '&postcode=' . $postcode;
-        }
+$webServiceUrl;
+if ($isExcludeImageCheck) {
+    $webServiceUrl = 'http://stu-nginx.cms.gre.ac.uk/~am238/WebServices/getAllPostsGivenSitterTypeAndPostcodeWithImages.php?sitterType=' . $sitterType . '&postcode=' . $postcode;
+} else {
+    $webServiceUrl = 'http://stu-nginx.cms.gre.ac.uk/~am238/WebServices/getAllPostsGivenSitterTypeAndPostcode.php?sitterType=' . $sitterType . '&postcode=' . $postcode;
+}
 
 include_once 'XmlDom.php';
 $xmlSitterServicesDom = XmlDom::getXmlDom($webServiceUrl);
@@ -53,15 +49,21 @@ $xmlSitterServicesDom = XmlDom::getXmlDom($webServiceUrl);
 //        }
 //        $_SESSION['sitterServices'] = $sitterServices;
 //        $_SESSION['sitterServicesSubset'] = searchResultsHandler::getResultsSubsetByPage($sitterServices, 1);
-# START XSLT
-$xslt = new XSLTProcessor();
-$xsl = new DOMDocument();
-$xsl->load('search.xsl', LIBXML_NOCDATA);
-$xslt->importStylesheet($xsl);
 
-print $xslt->transformToXML($xmlSitterServicesDom);
-//    }
-//} 
+if (isset($_POST['clientXslt'])) {
+    header('Content-type: text/xml');
+    $xslt = $xmlSitterServicesDom->createProcessingInstruction('xml-stylesheet', 'type="text/xsl" href="search.xsl"');
+    $xmlSitterServicesDom->insertBefore($xslt, $xmlSitterServicesDom->documentElement);
+    echo $xmlSitterServicesDom->saveXML();
+} else {
+# START XSLT
+    $xslt = new XSLTProcessor();
+    $xsl = new DOMDocument();
+    $xsl->load('search.xsl', LIBXML_NOCDATA);
+    $xslt->importStylesheet($xsl);
+    echo '<?xml version="1.0" encoding="UTF-8"?>';
+    print $xslt->transformToXML($xmlSitterServicesDom);
+}
 ?>
 
 

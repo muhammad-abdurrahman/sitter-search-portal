@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
     <xsl:template match="/">
         <html lang="en">
@@ -154,6 +153,8 @@
                                                     <option value="asc">Price (Ascending)</option>
                                                     <option value="desc">Price (Descending)</option>
                                                 </select>
+                                                <input type="checkbox" name="clientXslt" value="1" style="margin: 0 5px 0 15px;"/>
+                                                <span>Use client side xslt</span>
                                             </div>
                                         </div>
                                     </form>
@@ -164,74 +165,63 @@
                         <xsl:choose>
                             <xsl:when test="//Sitter">
                                 <xsl:for-each select="//Sitter">
-                                    <xsl:variable name="postId" select="SitterService/@id"/>
-                                    <xsl:variable name="userId" select="Sitter/@id"/>
-                                    <xsl:variable name="username" select="Username"/>
-                                    <xsl:variable name="email" select="EmailAddress"/>
-                                    <xsl:variable name="fullName" select="FullName"/>
-                                    <xsl:variable name="postcode" select="SitterService/Postcode"/>
-                                    <xsl:variable name="description" select="SitterService/Description"/>
-                                    <xsl:variable name="availability" select="SitterService/Availability"/>
-                                    <xsl:variable name="rate" select="SitterService/Rate"/>
-                                    <xsl:variable name="calloutCharge" select="SitterService/CalloutCharge"/>
-                                    <xsl:variable name="sittingType" select="SitterService/@type"/>
-                                    <xsl:variable name="borough" select="SitterService/@borough"/>
-                                    <!--<xsl:variable name="imageId" select="SitterService//ImageList//Image/@id"/>-->
-                                    <xsl:variable name="url" select="SitterService//ImageList//Image/Url"/>
-                                    <xsl:variable name="altText" select="SitterService//ImageList//Image/AltText"/>
-                                    <!--<xsl:variable name="images" select="ImageList"/>-->
-                                    <!--                                    <xsl:for-each select="SitterService">
-                                        <xsl:for-each select="ImageList">
-                                            <xsl:for-each select="Image">
-                                                <xsl:variable name="imageId" select="Image/@id"/>
-                                                <xsl:variable name="url" select="Url"/>
-                                                <xsl:variable name="altText" select="AltText"/>
-                                            </xsl:for-each>
-                                        </xsl:for-each>
-                                    </xsl:for-each>-->
+                                    <xsl:variable name="postId" select="./SitterService/@id"/>
+                                    <xsl:variable name="userId" select="./@id"/>
+                                    <xsl:variable name="username" select="./Username"/>
+                                    <xsl:variable name="email" select="./EmailAddress"/>
+                                    <xsl:variable name="fullName" select="./FullName"/>
+                                    <xsl:variable name="postcode" select="./SitterService/Postcode"/>
+                                    <xsl:variable name="description" select="./SitterService/Description"/>
+                                    <xsl:variable name="availability" select="./SitterService/Availability"/>
+                                    <xsl:variable name="rate" select="./SitterService/Rate"/>
+                                    <xsl:variable name="calloutCharge" select="./SitterService/CalloutCharge"/>
+                                    <xsl:variable name="sittingType" select="./SitterService/@type"/>
+                                    <xsl:variable name="borough" select="./SitterService/@borough"/>
                                     
-                                    <xsl:if test="SitterService/ImageList">
-                                        <div class="col-md-4">
-                                            <div class="thumbnail">
-                                                <a href="viewSitterService.php?id={$postId}">
-                                                    <img class="img-responsive" src="{$url}" alt="{$altText}" style="height: 233px; width: 350px;"/>
-                                                    <!--<img class="img-responsive" src="images/NoPostImage.png" alt="NoPostImage.png" style="height: 233px; width: 350px;"/>-->
-                                                </a>
-                                                <div class="caption text-center">
+                                    <xsl:choose>
+                                        <xsl:when test=".//Image">
+                                            <xsl:variable name="url" select="./SitterService/ImageList[1]/Image[1]/Url"/>
+                                            <xsl:variable name="altText" select="./SitterService/ImageList[1]/Image[1]/AltText"/>
+                                            <div class="col-md-4">
+                                                <div class="thumbnail">
                                                     <a href="viewSitterService.php?id={$postId}">
-                                                        <h3>
-                                                            <xsl:value-of select="$sittingType"/> | <xsl:value-of select="$postcode"/> | £<xsl:value-of select="$rate"/> | <xsl:value-of select="$borough"/>
-                                                        </h3>
+                                                        <img class="img-responsive" src="{$url}" alt="{$altText}" style="height: 233px; width: 350px;"/>
                                                     </a>
-                                                    <em>Posted by <xsl:value-of select="$username"/></em>
-                                                    <p style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                                                        <xsl:value-of select="$description"/>
-                                                    </p>
+                                                    <div class="caption text-center">
+                                                        <a href="viewSitterService.php?id={$postId}">
+                                                            <h3>
+                                                                <xsl:value-of select="$sittingType"/> | <xsl:value-of select="$postcode"/> | £<xsl:value-of select="$rate"/> | <xsl:value-of select="$borough"/>
+                                                            </h3>
+                                                        </a>
+                                                        <em>Posted by <xsl:value-of select="$username"/></em>
+                                                        <p style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                                            <xsl:value-of select="$description"/>
+                                                        </p>
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                    </xsl:if>
-                                    
-                                    <xsl:if test="not(itterService/ImageList)">
-                                        <div class="col-md-4">
-                                            <div class="thumbnail">
-                                                <a href="viewSitterService.php?id={$postId}">
-                                                    <img class="img-responsive" src="images/NoPostImage.png" alt="NoPostImage.png" style="height: 233px; width: 350px;"/>
-                                                </a>
-                                                <div class="caption text-center">
+                                        </xsl:when>
+                                        <xsl:otherwise>
+                                            <div class="col-md-4">
+                                                <div class="thumbnail">
                                                     <a href="viewSitterService.php?id={$postId}">
-                                                        <h3>
-                                                            <xsl:value-of select="$sittingType"/> | <xsl:value-of select="$postcode"/> | £<xsl:value-of select="$rate"/> | <xsl:value-of select="$borough"/>
-                                                        </h3>
+                                                        <img class="img-responsive" src="images/NoPostImage.png" alt="NoPostImage.png" style="height: 233px; width: 350px;"/>
                                                     </a>
-                                                    <em>Posted by <xsl:value-of select="$username"/></em>
-                                                    <p style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                                                        <xsl:value-of select="$description"/>
-                                                    </p>
+                                                    <div class="caption text-center">
+                                                        <a href="viewSitterService.php?id={$postId}">
+                                                            <h3>
+                                                                <xsl:value-of select="$sittingType"/> | <xsl:value-of select="$postcode"/> | £<xsl:value-of select="$rate"/> | <xsl:value-of select="$borough"/>
+                                                            </h3>
+                                                        </a>
+                                                        <em>Posted by <xsl:value-of select="$username"/></em>
+                                                        <p style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                                            <xsl:value-of select="$description"/>
+                                                        </p>
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                    </xsl:if>
+                                        </xsl:otherwise>
+                                    </xsl:choose>
                                 </xsl:for-each>
                             </xsl:when>
                             <xsl:otherwise>
@@ -240,31 +230,6 @@
                         </xsl:choose>
                         
                     </div>
-                    
-                    <nav class="text-center">
-                        <ul class="pagination">
-                            <!--                            <li class="disabled">-->
-                            <li>
-                                <a href="searchx.php?p=1" aria-label="Previous">
-                                    <span aria-hidden="true">«</span>
-                                </a>
-                            </li>
-                            <!--                            <li class="active">
-                                <a href="#">1<span class="sr-only">(current)</span></a>
-                            </li>
-                            <li>
-                                <a href="search.php?p=2">2</a>
-                            </li>
-                            <li>
-                                <a href="search.php?p=3">3</a>
-                            </li>-->
-                            <li>
-                                <a href="searchx.php?p=2" aria-label="Next">
-                                    <span aria-hidden="true">»</span>
-                                </a>
-                            </li>                
-                        </ul>
-                    </nav>
                 </div><!--/.container -->
 
 
